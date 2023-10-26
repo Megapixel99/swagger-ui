@@ -156,6 +156,32 @@ const curlify = (request, escape, newLine, ext = "") => {
   return curlified
 }
 
+const pythonify = (request) => {
+  let isMultipartFormDataRequest = false
+  let headers = request.get("headers")
+  let defaultHeaders = {
+    accept: 'application/json',
+    'content-type': 'application/json'
+  };
+  let headerData = defaultHeaders
+  if (headers) {
+    headers.entries().forEach((value, key) => headerData[key] = value);
+  }
+  let pythonified = `import requests
+
+url = "${request.get('url')}"
+
+${request.get("body") ? `payload = ${request.get("body")}` : ''}
+
+headers = ${headerData}
+
+response = requests.${request.get("method").toLowerCase()}(url, ${request.get("body") ? 'json=payload, ' : ''}headers=headers)
+
+print(response.text)`
+
+  return pythonified
+}
+
 // eslint-disable-next-line camelcase
 export const requestSnippetGenerator_curl_powershell = (request) => {
   return curlify(request, escapePowershell, "`\n", ".exe")
@@ -169,4 +195,9 @@ export const requestSnippetGenerator_curl_bash = (request) => {
 // eslint-disable-next-line camelcase
 export const requestSnippetGenerator_curl_cmd = (request) => {
   return curlify(request, escapeCMD, "^\n")
+}
+
+// eslint-disable-next-line camelcase
+export const requestSnippetGenerator_python = (request) => {
+  return pythonify(request)
 }

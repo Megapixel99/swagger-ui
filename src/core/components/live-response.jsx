@@ -51,6 +51,7 @@ export default class LiveResponse extends React.Component {
     const { showMutatedRequest, requestSnippetsEnabled } = getConfigs()
 
     const curlRequest = showMutatedRequest ? specSelectors.mutatedRequestFor(path, method) : specSelectors.requestFor(path, method)
+    const pythonRequest = showMutatedRequest ? specSelectors.mutatedRequestFor(path, method) : specSelectors.requestFor(path, method)
     const status = response.get("status")
     const url = curlRequest.get("url")
     const headers = response.get("headers").toJS()
@@ -70,12 +71,16 @@ export default class LiveResponse extends React.Component {
     const Markdown = getComponent("Markdown", true)
     const RequestSnippets = getComponent("RequestSnippets", true)
     const Curl = getComponent("curl")
+    const Python = getComponent("python")
 
     return (
       <div>
         { curlRequest && (requestSnippetsEnabled === true || requestSnippetsEnabled === "true"
           ? <RequestSnippets request={ curlRequest }/>
           : <Curl request={ curlRequest } getConfigs={ getConfigs } />) }
+        { pythonRequest && (requestSnippetsEnabled === true || requestSnippetsEnabled === "true"
+          ? <RequestSnippets request={ pythonRequest }/>
+          : <Python request={ pythonRequest } getConfigs={ getConfigs } />) }
         { url && <div>
             <div className="request-url">
               <h4>Request URL</h4>
